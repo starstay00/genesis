@@ -257,13 +257,14 @@
                         for(let i=0; i<n; i++){
                             pageBtn.eq(i).css({display:'block'}); // 페이지 버튼 8개 보임
                         }
-                        cnt=0; // 페이지 초기화
+                        if(cnt>=7){
+                            cnt=7;
+                        }
                     }
                     else { // 1280px 이하는 슬라이드 1개,
                         slideWidth = (section2Container.innerWidth() - 0 + 20 + 20)/1;
                         n = slide.length; // 10
                         pageBtn.css({display:'block'}); // 페이지 버튼 10개 보임
-                        cnt=0; // 페이지 초기화
                     }
                 }
                 else { // 1642px 초과
