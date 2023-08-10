@@ -38,6 +38,7 @@
             // translateX(-?px)
             slideImg.css({width: imgRate * winWidth, transform:`translateX(${-(imgRate*winWidth)*transRate}px)`});
 
+            // 반응형
             $(window).resize(function(){
                 winWidth = $(window).innerWidth(); // 창 크기 변할 때마다 계산되어야 함
                 sizeX = winWidth /2;
@@ -46,6 +47,7 @@
     
 
             // 터치 스와이프 이벤트
+                // 마우스 터치 스와이프 / 드래그 앤 드롭 이벤트 : 데스크탑
             slideContainer.on({
                 mousedown(e){
                     winWidth = $(window).innerWidth();
@@ -108,6 +110,48 @@
                     }
                 })
 
+            // 손가락 터치 스와이프 / 드래그 앤 드롭 이벤트 : 태블릿 & 모바일 태블릿 => 모바일에서만 이벤트 동작
+            // originalEvent: TouchEvent, type: 'touchstart'
+            slideContainer.on({
+                touchstart(e){       // = mousedown
+                    //console.log(e.originalEvent.changedTouches[0].clientX);
+                    winWidth = $(window).innerWidth();
+                    sizeX = winWidth /2;
+                    mouseDown = e.originalEvent.changedTouches[0].clientX;
+                    dragStart = e.originalEvent.changedTouches[0].clientX - (slideWrap.offset().left + winWidth);
+                    mDown = true;
+                    slideView.css({cursor:'grabbing'});
+                }, 
+                touchend(e){        // = mouseup
+                    //console.log(e.originalEvent.changedTouches[0].clientX);
+                    mouseUp = e.originalEvent.changedTouches[0].clientX;
+                    if(mouseDown-mouseUp > sizeX){
+                        clearInterval(setId); // 클릭시 일시중지
+                        if(!slideWrap.is(':animated')){
+                            nextCount();
+                        }
+                    }
+                    if(mouseDown-mouseUp < -sizeX){
+                        clearInterval(setId);
+                        if(!slideWrap.is(':animated')){
+                            prevCount();
+                        }
+                    }
+                    if(mouseDown-mouseUp >= -sizeX && mouseDown-mouseUp <= sizeX){
+                        mainSlide();
+                    }
+                    mDown = false;
+                    slideView.css({cursor:'grab'});
+                },   
+                touchmove(e){       // = mousemove
+                    if(!mDown){
+                        return;
+                    }
+                    dragEnd = e.originalEvent.changedTouches[0].clientX;
+                    slideWrap.css({left:dragEnd-dragStart});
+                },  
+            });
+            
             function mainSlide(){
                 slideWrap.stop().animate({left: `${-100*cnt}%`}, 600, 'easeInOutExpo', function(){
                     if(cnt>n){cnt=0}
@@ -226,6 +270,7 @@
                 resizeFn();
             });
 
+            // 데스크탑 : 터치 스와이프, 드래그앤드롭
             slideContainer.on({
                 mousedown(e){
                     touchStart = e.clientX;
@@ -256,6 +301,7 @@
                     }
                 }
             });
+
             $(document).on({
                 mouseup(e){
                     // mDown = true; 상태에서 
@@ -273,6 +319,39 @@
                     slideView.css({cursor:'grab'});
                 }
             })
+
+            //태블릿, 모바일 : 터치 스와이프, 드래그앤드롭
+            slideContainer.on({
+                touchstart(e){  // 이벤트는 대/소문자 구분없음, 모두 소문자
+                    touchStart = e.originalEvent.changedTouches[0].clientX;
+                    dragStart = e.originalEvent.changedTouches[0].clientX - (slideWrap.offset().left - offsetL);
+                    mDown = true;
+                    slideView.css({cursor:'grabbing'});
+                },                
+                touchend(e){
+                    touchEnd = e.originalEvent.changedTouches[0].clientX;
+                    if(touchStart-touchEnd > sizeX){
+                        nextCount();
+                    }
+                    if(touchStart-touchEnd < -sizeX){
+                        prevCount();
+                    }
+                    mDown = false; 
+                    if(touchStart-touchEnd >= -sizeX && touchStart-touchEnd <= sizeX){
+                        mainSlide();
+                    }
+                    slideView.css({cursor:'grab'});
+                },
+                touchmove(e){
+                    if(!mDown) return;
+                    dragEnd = e.originalEvent.changedTouches[0].clientX;
+                    slideWrap.css({left:dragEnd-dragStart});
+                    if(touchStart-touchEnd >= -sizeX && touchStart-touchEnd <= sizeX){
+                        mainSlide();
+                    }
+                }
+            });
+
 
             // 다음 카운트 함수
             function nextCount(){
