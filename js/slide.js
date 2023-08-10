@@ -226,7 +226,7 @@
             const subMenu = $('#section2 .sub-menu');
             const materialIcons = $('#section2 .select-btn .material-icons');
             const heightRate = 0.884545392; // 슬라이드 넓이에 대한 높이 비율
-            let n; // 10개 
+            let n = slide.length -2; // 10개 
 
             // 터치스와이프
             let touchStart = null;
@@ -257,8 +257,8 @@
                         for(let i=0; i<n; i++){
                             pageBtn.eq(i).css({display:'block'}); // 페이지 버튼 8개 보임
                         }
-                        if(cnt>=7){
-                            cnt=7;
+                        if(cnt>=n-1){ // 페이지 버튼이 8(배열 7),9(배열 8),10(배열 9) 번 일때 8번 위치로 이동
+                            cnt=n-1;
                         }
                     }
                     else { // 1280px 이하는 슬라이드 1개,
@@ -269,6 +269,10 @@
                 }
                 else { // 1642px 초과
                     slideWidth = (section2Container.innerWidth() - 198 + 20 + 20)/3;
+                    pageBtn.css({display:'none'}); // 페이지 버튼 모두 숨김
+                    for(let i=0; i<n; i++){
+                        pageBtn.eq(i).css({display:'block'}); // 페이지 버튼 8개 보임
+                    }
                 }
                 slideWrap.css({width:slideWidth * 10});
                 slide.css({width:slideWidth, height:slideWidth * heightRate});
