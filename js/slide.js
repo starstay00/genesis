@@ -226,6 +226,7 @@
             const subMenu = $('#section2 .sub-menu');
             const materialIcons = $('#section2 .select-btn .material-icons');
             const heightRate = 0.884545392; // 슬라이드 넓이에 대한 높이 비율
+            let n; // 10개 
 
             // 터치스와이프
             let touchStart = null;
@@ -239,7 +240,7 @@
             let offsetL = slideWrap.offset().left;
             let slideWidth;
 
-            // console.log(slideWrap.offset().left);
+            // console.log(slideWrap.offset().left); 좌측 좌표값
 
             resizeFn(); // 로딩시
             
@@ -250,9 +251,19 @@
                 if(winWidth <= 1642) {// 이하 winWidth <= 1642
                     if(winWidth > 1280) { //1280px 초과는 슬라이드 3개
                         slideWidth = (section2Container.innerWidth() - 0 + 20 + 20)/3;
+                        n = slide.length - 2; // 8=10-2
+                        // 페이지 버튼 갯수 제어 : 8개 / 10개인 경우
+                        pageBtn.css({display:'none'}); // 페이지 버튼 모두 숨김
+                        for(let i=0; i<n; i++){
+                            pageBtn.eq(i).css({display:'block'}); // 페이지 버튼 8개 보임
+                        }
+                        cnt=0; // 페이지 초기화
                     }
                     else { // 1280px 이하는 슬라이드 1개,
                         slideWidth = (section2Container.innerWidth() - 0 + 20 + 20)/1;
+                        n = slide.length; // 10
+                        pageBtn.css({display:'block'}); // 페이지 버튼 10개 보임
+                        cnt=0; // 페이지 초기화
                     }
                 }
                 else { // 1642px 초과
@@ -262,6 +273,7 @@
                 slide.css({width:slideWidth, height:slideWidth * heightRate});
                 slideH3.css({fontSize:slideWidth * 0.07});
                 slideH4.css({fontSize:slideWidth * 0.03});
+
                 mainSlide(); // 슬라이드에 슬라이드 넓이를 전달하기 위해 호출
             }
 
@@ -352,11 +364,10 @@
                 }
             });
 
-
             // 다음 카운트 함수
             function nextCount(){
                 cnt++;
-                if(cnt>7){cnt=7};
+                if(cnt>n-1){cnt=n-1};
                 mainSlide();
             }
             // 이전 카운트 함수
